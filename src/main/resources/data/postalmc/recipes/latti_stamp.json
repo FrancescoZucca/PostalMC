@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RPB",
+    "ppp"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:red_dye"
+    },
+    "P": {
+      "item": "minecraft:pink_dye"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    },
+    "p": {
+      "item": "minecraft:paper"
+    }
+  },
+  "result": {
+    "item": "postalmc:latti_stamp",
+    "count": 3
+  }
+}

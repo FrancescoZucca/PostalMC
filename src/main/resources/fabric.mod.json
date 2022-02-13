@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "postalmc",
+  "version": "${version}",
+  "name": "Postalmc",
+  "description": "",
+  "authors": [
+    "ZFrancesco"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/postalmc/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "mod.francescozucca.postalmc.client.PostalmcClient"
+    ],
+    "main": [
+      "mod.francescozucca.postalmc.Postalmc"
+    ]
+  },
+  "mixins": [
+    "postalmc.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.13.1",
+    "fabric": "*",
+    "minecraft": "1.18.1"
+  }
+}
