@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "up": "postalmc:block/mailbox_top",
+    "down": "postalmc:block/mailbox_bottom",
+    "north": "postalmc:block/mailbox",
+    "south": "postalmc:block/mailbox",
+    "west": "postalmc:block/mailbox",
+    "east": "postalmc:block/mailbox"
+  }
+}
+

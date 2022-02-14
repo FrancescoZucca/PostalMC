@@ -13,7 +13,7 @@ public class AddressDestinationGUI extends WPlainPanel {
 
     public AddressDestinationGUI(){
         sprite = new WSprite(new Identifier("minecraft", "textures/block/grass_block_side.png"));
-        this.add(sprite, 2, 2, 16, 16);
+        this.add(sprite, 2, 2, 18, 18);
         button = new WButton(Text.of("nsjnfsdnf"));
         this.add(button, 16+4, 2, 7*18, 20);
 

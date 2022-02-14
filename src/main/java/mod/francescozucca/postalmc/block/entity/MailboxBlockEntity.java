@@ -5,6 +5,7 @@ import mod.francescozucca.postalmc.block.gui.MailboxScreenHandler;
 import mod.francescozucca.postalmc.util.IMailbox;
 import mod.francescozucca.postalmc.util.ImplementedInventory;
 import mod.francescozucca.postalmc.util.MailboxManager;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,7 +15,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -93,6 +97,17 @@ public class MailboxBlockEntity extends BlockEntity implements ExtendedScreenHan
         Postalmc.MMAN.removeMailbox(this);
         this.sprite = sprite==null?new Identifier("minecraft", "textures/block/grass_block_side.png"):sprite;
         Postalmc.MMAN.addMailbox(this);
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
+    }
+
+    @Override
+    public NbtCompound toInitialChunkDataNbt() {
+        return createNbt();
     }
 
     @Override
