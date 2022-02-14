@@ -56,7 +56,7 @@ public class AddressBookGUI extends SyncedGuiDescription {
             });
         };
 
-        ArrayList<MailboxDestination> mdlist = Postalmc.MMAN.getMailboxes();
+        ArrayList<MailboxDestination> mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
 
         mdlist.forEach((mailboxDestination -> {
             PacketByteBuf buf = PacketByteBufs.create();
@@ -64,7 +64,7 @@ public class AddressBookGUI extends SyncedGuiDescription {
             ClientPlayNetworking.send(Postalmc.CHECK_MAILBOX, buf);
         }));
 
-        mdlist = Postalmc.MMAN.getMailboxes();
+        mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
 
         WListPanel<MailboxDestination, AddressDestinationGUI> list = new WListPanel<>(mdlist, AddressDestinationGUI::new ,configurator);
         list.setListItemHeight(18);
@@ -99,7 +99,7 @@ public class AddressBookGUI extends SyncedGuiDescription {
             });
         };
 
-        ArrayList<MailboxDestination> mdlist = Postalmc.MMAN.getMailboxes();
+        ArrayList<MailboxDestination> mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
 
         mdlist.forEach((mailboxDestination -> {
             PacketByteBuf buf = PacketByteBufs.create();
@@ -107,7 +107,7 @@ public class AddressBookGUI extends SyncedGuiDescription {
             ClientPlayNetworking.send(Postalmc.CHECK_MAILBOX, buf);
         }));
 
-        mdlist = Postalmc.MMAN.getMailboxes();
+        mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
 
         WListPanel<MailboxDestination, AddressDestinationGUI> list = new WListPanel<>(mdlist, AddressDestinationGUI::new ,configurator);
         list.setListItemHeight(18);

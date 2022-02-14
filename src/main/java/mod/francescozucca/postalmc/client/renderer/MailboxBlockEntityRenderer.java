@@ -25,7 +25,7 @@ public class MailboxBlockEntityRenderer implements BlockEntityRenderer<mod.franc
 
     @Override
     public void render(MailboxBlockEntity mbe, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        Text text = new LiteralText(mbe.getName());
+        Text text = new LiteralText(mbe.getName()==null?"null":mbe.getName());
         matrices.push();
         matrices.translate(0.5, 1.35, 0.5);
         matrices.multiply(MinecraftClient.getInstance().getEntityRenderDispatcher().getRotation());

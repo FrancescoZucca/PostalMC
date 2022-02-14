@@ -34,13 +34,16 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Postalmc implements ModInitializer {
 
-    public static MailboxManager MMAN;
+    public static MailboxManager MMAN_OVERWORLD;
+    public static MailboxManager MMAN_NETHER;
+    public static MailboxManager MMAN_END;
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -77,13 +80,17 @@ public class Postalmc implements ModInitializer {
     public void onInitialize() {
         registerBlock(MAILBOX, "mailbox", true);
         registerBlock(ADDRESS_BOOK, "address_book", true);
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN = (MailboxManager) server.getOverworld().getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc"));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN_OVERWORLD = (MailboxManager) server.getOverworld().getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_overworld"));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN_NETHER = (MailboxManager) server.getWorld(World.NETHER).getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_nether"));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN_END = (MailboxManager) server.getWorld(World.END).getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_end"));
 
         ServerPlayNetworking.registerGlobalReceiver(SEND_ITEM_NETWORK_PACKET, ((server, player, handler, buf, responseSender) -> {
             BlockPos mailboxPos = buf.readBlockPos();
             BlockPos addressBookPos = buf.readBlockPos();
             int stamps = buf.readInt();
             ServerWorld world = player.getWorld();
+            RegistryKey<World> dimension = world.getRegistryKey();
+            MailboxManager MMAN = getMMANForWorld(dimension);
             server.execute(()-> {
                 BlockEntity be = world.getBlockEntity(mailboxPos);
                 BlockEntity be2 = world.getBlockEntity(addressBookPos);
@@ -110,6 +117,8 @@ public class Postalmc implements ModInitializer {
 
         ServerPlayNetworking.registerGlobalReceiver(CHECK_MAILBOX, ((server, player, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();
+            RegistryKey<World> dimension = player.world.getRegistryKey();
+            MailboxManager MMAN = getMMANForWorld(dimension);
             server.execute(()->{
                 if(!(player.getWorld().getBlockEntity(pos) instanceof MailboxBlockEntity)){
                     MMAN.removeMailbox(new MailboxDestination(pos, null));
@@ -135,5 +144,12 @@ public class Postalmc implements ModInitializer {
 
     private static Item registerItem(Item item, String name){
         return Registry.register(Registry.ITEM, id(name), item);
+    }
+
+    public static MailboxManager getMMANForWorld(RegistryKey<World> world){
+        if(world==World.OVERWORLD) return MMAN_OVERWORLD;
+        if(world==World.NETHER) return MMAN_NETHER;
+        if(world==World.END) return MMAN_END;
+        throw new IllegalArgumentException("Unknown dimension type!");
     }
 }

@@ -75,13 +75,13 @@ public class Mailbox extends BlockWithEntity {
                 ((MailboxBlockEntity) be).setName(itemStack.getName()==null?null:itemStack.getName().asString());
             }
         }
-        Postalmc.MMAN.addMailbox((MailboxBlockEntity) be);
+        Postalmc.getMMANForWorld(world.getRegistryKey()).addMailbox((MailboxBlockEntity) be);
     }
 
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if(world.isClient) return;
-        Postalmc.MMAN.removeMailbox((MailboxBlockEntity) world.getBlockEntity(pos));
+        Postalmc.getMMANForWorld(world.getRegistryKey()).removeMailbox((MailboxBlockEntity) world.getBlockEntity(pos));
     }
 
     @Override

@@ -18,7 +18,8 @@ public class SplashTextResourceSupplierMixin {
 
     private static final String[] newSplashes = {
             "A foras sa NATO!",
-            "Tempus Fides Pueris!"
+            "Tempus Fides Pueris!",
+            "BANK ANGLE BANK ANGLE BANK ANGLE"
     };
 
     @Shadow @Final private List<String> splashTexts;

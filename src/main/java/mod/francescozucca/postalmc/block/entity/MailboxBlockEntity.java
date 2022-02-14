@@ -94,9 +94,9 @@ public class MailboxBlockEntity extends BlockEntity implements ExtendedScreenHan
     }
 
     public void setSprite(Identifier sprite){
-        Postalmc.MMAN.removeMailbox(this);
+        Postalmc.getMMANForWorld(world.getRegistryKey()).removeMailbox(this);
         this.sprite = sprite==null?new Identifier("minecraft", "textures/block/grass_block_side.png"):sprite;
-        Postalmc.MMAN.addMailbox(this);
+        Postalmc.getMMANForWorld(world.getRegistryKey()).addMailbox(this);
     }
 
     @Nullable
