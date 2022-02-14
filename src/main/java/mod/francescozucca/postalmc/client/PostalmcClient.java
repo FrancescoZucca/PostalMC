@@ -2,7 +2,9 @@ package mod.francescozucca.postalmc.client;
 
 import mod.francescozucca.postalmc.Postalmc;
 import mod.francescozucca.postalmc.block.gui.AddressBookGUI;
+import mod.francescozucca.postalmc.block.gui.InterdimensionalAddressBookGUI;
 import mod.francescozucca.postalmc.client.gui.AddressBookScreen;
+import mod.francescozucca.postalmc.client.gui.InterdimensionalAddressBookScreen;
 import mod.francescozucca.postalmc.client.gui.MailboxScreen;
 import mod.francescozucca.postalmc.client.renderer.MailboxBlockEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
@@ -16,5 +18,6 @@ public class PostalmcClient implements ClientModInitializer {
         ScreenRegistry.register(Postalmc.MAILBOX_SCREEN_HANDLER_SCREEN_HANDLER_TYPE, MailboxScreen::new);
         ScreenRegistry.<AddressBookGUI, AddressBookScreen>register(Postalmc.ADDRESS_BOOK_GUI_SCREEN_HANDLER_TYPE, (gui, inventory, title) -> new AddressBookScreen(gui, inventory.player, title));
         BlockEntityRendererRegistry.register(Postalmc.MAILBOX_BLOCK_ENTITY_BLOCK_ENTITY_TYPE, MailboxBlockEntityRenderer::new);
+        ScreenRegistry.<InterdimensionalAddressBookGUI, InterdimensionalAddressBookScreen>register(Postalmc.INTERDIMENSIONAL_ADDRESS_BOOK_GUI_SCREEN_HANDLER_TYPE, (gui, inventory, title)->new InterdimensionalAddressBookScreen(gui, inventory.player, title));
     }
 }

@@ -25,6 +25,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class MailboxBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, IMailbox {
@@ -87,6 +89,11 @@ public class MailboxBlockEntity extends BlockEntity implements ExtendedScreenHan
     @Override
     public Identifier getSprite() {
         return sprite;
+    }
+
+    @Override
+    public RegistryKey<World> getDimension() {
+        return world.getRegistryKey();
     }
 
     public void setName(String name){

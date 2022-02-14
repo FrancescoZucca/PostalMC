@@ -21,13 +21,13 @@ import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
-public class AddressBookGUI extends SyncedGuiDescription {
+public class InterdimensionalAddressBookGUI extends SyncedGuiDescription {
 
-    private static final int INVENTORY_SIZE = 1;
     private BlockPos pos;
+    private static final int INVENTORY_SIZE = 1;
 
-    public AddressBookGUI(int syncId, PlayerInventory playerInventory, PacketByteBuf buf1, ScreenHandlerContext context){
-        super(Postalmc.ADDRESS_BOOK_GUI_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(context));
+    public InterdimensionalAddressBookGUI(int syncId, PlayerInventory playerInventory, PacketByteBuf buf1, ScreenHandlerContext ctx) {
+        super(Postalmc.INTERDIMENSIONAL_ADDRESS_BOOK_GUI_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(ctx, INVENTORY_SIZE), getBlockPropertyDelegate(ctx));
         pos = buf1.readBlockPos();
 
         WGridPanel root = new WGridPanel();
@@ -42,7 +42,7 @@ public class AddressBookGUI extends SyncedGuiDescription {
 
         BiConsumer<MailboxDestination, AddressDestinationGUI> configurator = (MailboxDestination s, AddressDestinationGUI destination) -> {
             destination.sprite.setImage(new Identifier(s.getSprite().getNamespace(),  s.getSprite().getPath().contains(".png")?s.getSprite().getPath():"textures/"+s.getSprite().getPath()+".png"));
-            destination.button.setLabel(new LiteralText(s.getName()+" - "+IMailbox.calculateCost(s, pos, world.getRegistryKey())));
+            destination.button.setLabel(new LiteralText(s.getName()+" - "+ IMailbox.calculateCost(s, pos, world.getRegistryKey())));
             destination.button.setOnClick(()->{
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(s.getPos());
@@ -53,15 +53,7 @@ public class AddressBookGUI extends SyncedGuiDescription {
             });
         };
 
-        ArrayList<MailboxDestination> mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
-
-        mdlist.forEach((mailboxDestination -> {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeBlockPos(mailboxDestination.getPos());
-            ClientPlayNetworking.send(Postalmc.CHECK_MAILBOX, buf);
-        }));
-
-        mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
+        ArrayList<MailboxDestination> mdlist = MailboxManager.getInterdimentionalMailboxes();
 
         WListPanel<MailboxDestination, AddressDestinationGUI> list = new WListPanel<>(mdlist, AddressDestinationGUI::new ,configurator);
         list.setListItemHeight(18);
@@ -70,9 +62,9 @@ public class AddressBookGUI extends SyncedGuiDescription {
         root.validate(this);
     }
 
-    public AddressBookGUI(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-        super(Postalmc.ADDRESS_BOOK_GUI_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(context));
 
+    public InterdimensionalAddressBookGUI(int syncId, PlayerInventory inventory, ScreenHandlerContext ctx) {
+        super(Postalmc.INTERDIMENSIONAL_ADDRESS_BOOK_GUI_SCREEN_HANDLER_TYPE, syncId, inventory, getBlockInventory(ctx, INVENTORY_SIZE), getBlockPropertyDelegate(ctx));
         pos = BlockPos.ORIGIN;
 
         WGridPanel root = new WGridPanel();
@@ -87,24 +79,18 @@ public class AddressBookGUI extends SyncedGuiDescription {
 
         BiConsumer<MailboxDestination, AddressDestinationGUI> configurator = (MailboxDestination s, AddressDestinationGUI destination) -> {
             destination.sprite.setImage(new Identifier(s.getSprite().getNamespace(),  s.getSprite().getPath().contains(".png")?s.getSprite().getPath():"textures/"+s.getSprite().getPath()+".png"));
-            destination.button.setLabel(new LiteralText(s.getName()+" - "+IMailbox.calculateCost(s, pos, world.getRegistryKey())));
+            destination.button.setLabel(new LiteralText(s.getName()+" - "+ IMailbox.calculateCost(s, pos, world.getRegistryKey())));
             destination.button.setOnClick(()->{
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(s.getPos());
+                buf.writeInt(MailboxManager.getIntFromDim(s.getDimension()));
                 buf.writeBlockPos(pos);
+                buf.writeInt(IMailbox.calculateCost(s, pos, world.getRegistryKey()));
                 ClientPlayNetworking.send(Postalmc.SEND_ITEM_NETWORK_PACKET, buf);
             });
         };
 
-        ArrayList<MailboxDestination> mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
-
-        mdlist.forEach((mailboxDestination -> {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeBlockPos(mailboxDestination.getPos());
-            ClientPlayNetworking.send(Postalmc.CHECK_MAILBOX, buf);
-        }));
-
-        mdlist = Postalmc.getMMANForWorld(world.getRegistryKey()).getMailboxes();
+        ArrayList<MailboxDestination> mdlist = MailboxManager.getInterdimentionalMailboxes();
 
         WListPanel<MailboxDestination, AddressDestinationGUI> list = new WListPanel<>(mdlist, AddressDestinationGUI::new ,configurator);
         list.setListItemHeight(18);

@@ -1,10 +1,11 @@
 package mod.francescozucca.postalmc.util;
 
-import mod.francescozucca.postalmc.Postalmc;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 import java.util.Iterator;
 
@@ -12,13 +13,14 @@ public interface IMailbox {
     BlockPos getPos();
     String getName();
     Identifier getSprite();
+    RegistryKey<World> getDimension();
 
     static int calculateDistance(BlockPos pos1, BlockPos pos2){
         return (int)Math.ceil(pos1.getManhattanDistance(pos2));
     }
 
-    static int calculateCost(IMailbox m1, BlockPos pos){
-        return (calculateDistance(m1.getPos(), pos)/75)+1;
+    static int calculateCost(IMailbox m1, BlockPos pos, RegistryKey<World> registryKey){
+        return Math.min(((calculateDistance(m1.getPos(), pos)/75)+1)*(m1.getDimension()==registryKey?1:5), 64*3);
     }
 
     static boolean removeStampsFromPlayer(PlayerInventory inv, int stamps){
