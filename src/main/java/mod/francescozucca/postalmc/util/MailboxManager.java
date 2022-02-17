@@ -114,9 +114,9 @@ public class MailboxManager extends PersistentState {
 
     public static ArrayList<MailboxDestination> getInterdimentionalMailboxes(){
         ArrayList<MailboxDestination> ret = new ArrayList<>();
-        ret.addAll(Postalmc.getMMANForWorld(World.OVERWORLD).getMailboxes());
-        ret.addAll(Postalmc.getMMANForWorld(World.NETHER).getMailboxes());
-        ret.addAll(Postalmc.getMMANForWorld(World.END).getMailboxes());
+        ret.addAll(Postalmc.MMAN_OVERWORLD.getMailboxes());
+        ret.addAll(Postalmc.MMAN_NETHER.getMailboxes());
+        ret.addAll(Postalmc.MMAN_END.getMailboxes());
         return ret;
     }
 }

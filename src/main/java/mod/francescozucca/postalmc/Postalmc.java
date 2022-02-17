@@ -33,6 +33,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -47,6 +48,7 @@ public class Postalmc implements ModInitializer {
     public static MailboxManager MMAN_OVERWORLD;
     public static MailboxManager MMAN_NETHER;
     public static MailboxManager MMAN_END;
+    public static MinecraftServer SERVER;
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -92,6 +94,7 @@ public class Postalmc implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN_OVERWORLD = (MailboxManager) server.getOverworld().getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_overworld"));
         ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN_NETHER = (MailboxManager) server.getWorld(World.NETHER).getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_nether"));
         ServerLifecycleEvents.SERVER_STARTED.register(server -> MMAN_END = (MailboxManager) server.getWorld(World.END).getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_end"));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> SERVER = server);
 
         ServerPlayNetworking.registerGlobalReceiver(SEND_ITEM_NETWORK_PACKET, ((server, player, handler, buf, responseSender) -> {
             BlockPos mailboxPos = buf.readBlockPos();
@@ -99,7 +102,7 @@ public class Postalmc implements ModInitializer {
             BlockPos addressBookPos = buf.readBlockPos();
             int stamps = buf.readInt();
             ServerWorld world = server.getWorld(MailboxManager.getDimFromInt(dim));
-            MailboxManager MMAN = getMMANForWorld(MailboxManager.getDimFromInt(dim));
+            MailboxManager MMAN = getMMANForWorld(world);
             server.execute(()-> {
                 BlockEntity be = world.getBlockEntity(mailboxPos);
                 BlockEntity be2 = player.world.getBlockEntity(addressBookPos);
@@ -129,7 +132,9 @@ public class Postalmc implements ModInitializer {
             Identifier sprite = buf.readIdentifier();
             server.execute(()->{
                 if(player.getWorld().getBlockEntity(pos) instanceof MailboxBlockEntity mbe){
+                    getMMANForWorld(player.getWorld()).removeMailbox(mbe);
                     mbe.setSprite(sprite);
+                    getMMANForWorld(player.getWorld()).addMailbox(mbe);
                 }
             });
         }));
@@ -137,7 +142,7 @@ public class Postalmc implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(CHECK_MAILBOX, ((server, player, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();
             RegistryKey<World> dimension = player.world.getRegistryKey();
-            MailboxManager MMAN = getMMANForWorld(dimension);
+            MailboxManager MMAN = getMMANForWorld(server.getWorld(dimension));
             server.execute(()->{
                 if(!(player.getWorld().getBlockEntity(pos) instanceof MailboxBlockEntity)){
                     MMAN.removeMailbox(new MailboxDestination(pos, "", MailboxManager.getIntFromDim(dimension)));
@@ -165,10 +170,14 @@ public class Postalmc implements ModInitializer {
         return Registry.register(Registry.ITEM, id(name), item);
     }
 
-    public static MailboxManager getMMANForWorld(RegistryKey<World> world){
-        if(world==World.OVERWORLD) return MMAN_OVERWORLD;
-        if(world==World.NETHER) return MMAN_NETHER;
-        if(world==World.END) return MMAN_END;
-        throw new IllegalArgumentException("Unknown dimension type!");
+    public static MailboxManager getMMANForWorld(ServerWorld world){
+        if(world.getRegistryKey()==World.OVERWORLD) return MMAN_OVERWORLD;
+        if(world.getRegistryKey()==World.NETHER) return MMAN_NETHER;
+        if(world.getRegistryKey()==World.END) return MMAN_END;
+        return (MailboxManager) world.getPersistentStateManager().getOrCreate(MailboxManager::fromNbt, MailboxManager::new, "postalmc_"+world.getRegistryKey().getValue().getPath());
+    }
+
+    public static MailboxManager getMMANForWorld(RegistryKey<World> dimension){
+        return getMMANForWorld(SERVER.getWorld(dimension));
     }
 }
